@@ -40,7 +40,8 @@ def find_values(filename:str, keyword:str, n_elements: int) -> np.array:
     elements = np.reshape(elements.astype(np.complex), (count, n_elements))
     return(elements)
 
-            
+captured_preambles = find_values("preamble.log", "COMECO\n", 130)
 
-#print(phase(preamble, captured_preamble[1]))
-elements = find_values("preamble.log", "COMECO\n", 130)
+magn_preambles = np.zeros(captured_preambles.shape[0])
+for i in range(captured_preambles.shape[0]):
+    magn_preambles = magn(i, captured_preambles)
