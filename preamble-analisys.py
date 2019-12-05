@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.matlib
+import matplotlib.pyplot as plt
 
 # Generating preamble
 n_repetitions = 10
@@ -9,12 +10,16 @@ preamble = np.matlib.repmat(barker_code, 1, n_repetitions)[0]
 magn_preamble = np.sqrt(np.sum(np.power(np.abs(preamble),2)))
 
 def magn(ind_preamble: int, preambles: np.array) -> np.float:
-    magn_val = np.sqrt(np.sum(np.power(np.abs(preambles[ind_preamble]),2)))
+    magn_val = np.abs(np.sqrt(np.sum(np.power(np.abs(preambles[ind_preamble]),2))) - magn_preamble)
     return magn_val
 
 def phase(original_preambles: np.array, captured_preambles: np.array) -> np.float:
     phases_diff = np.abs(np.arctan(original_preambles.imag/original_preambles.real)-np.arctan(captured_preambles.imag/captured_preambles.real))
     return phases_diff
+
+def snr(original_preambles: np.array, captured_preambles: np.array) -> np.float:
+    snr_values = 10* np.log10(np.mean(np.power(original_preambles, 2))/np.mean(np.abs(np.power(original_preambles, 2)-np.power(captured_preambles, 2))))
+    return snr_values
 
 def find_values(filename:str, keyword:str, n_elements: int) -> np.array:
     elements = np.array([])
@@ -42,6 +47,28 @@ def find_values(filename:str, keyword:str, n_elements: int) -> np.array:
 
 captured_preambles = find_values("preamble.log", "COMECO\n", 130)
 
-magn_preambles = np.zeros(captured_preambles.shape[0])
+magn_preambles = np.array([])
+phase_error_preambles = np.array([])
+snr_preambles = np.array([])
 for i in range(captured_preambles.shape[0]):
-    magn_preambles = magn(i, captured_preambles)
+    magn_preambles = np.append(magn_preambles, magn(i, captured_preambles))
+for i in range(captured_preambles.shape[0]):
+    phase_error_preambles = np.append(phase_error_preambles, phase(preamble, captured_preambles[i]))
+for i in range(captured_preambles.shape[0]):
+    snr_preambles = np.append(snr_preambles, snr(preamble, captured_preambles[i]))
+    
+plt.figure()
+plt.plot(range(captured_preambles.shape[0]), magn_preambles)
+plt.xlabel("Preamble Number")
+plt.ylabel("Magnitude")
+
+plt.figure()
+plt.plot(range(captured_preambles.shape[0]*captured_preambles.shape[1]), phase_error_preambles)
+plt.xlabel("samples")
+plt.ylabel("Phase Error")
+
+plt.figure()
+plt.plot(range(captured_preambles.shape[0]), snr_preambles)
+plt.xlabel("samples")
+plt.ylabel("SNR")
+plt.show()
