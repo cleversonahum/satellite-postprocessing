@@ -63,7 +63,7 @@ plt.xlabel("Preamble Number")
 plt.ylabel("Magnitude")
 
 plt.figure()
-plt.plot(range(captured_preambles.shape[0]*captured_preambles.shape[1]), phase_error_preambles)
+plt.plot(range(2000), phase_error_preambles[0:2000])
 plt.xlabel("samples")
 plt.ylabel("Phase Error")
 
