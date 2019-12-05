@@ -18,7 +18,7 @@ def phase(original_preambles: np.array, captured_preambles: np.array) -> np.floa
     return phases_diff
 
 def snr(original_preambles: np.array, captured_preambles: np.array) -> np.float:
-    snr_values = 10* np.log10(np.mean(np.power(original_preambles, 2))/np.mean(np.abs(np.power(original_preambles, 2)-np.power(captured_preambles, 2))))
+    snr_values = 20* np.log10(np.mean(np.power(original_preambles, 2))/np.mean(np.power(np.abs(original_preambles-captured_preambles),2)))
     return snr_values
 
 def find_values(filename:str, keyword:str, n_elements: int) -> np.array:
@@ -69,6 +69,8 @@ plt.ylabel("Phase Error")
 
 plt.figure()
 plt.plot(range(captured_preambles.shape[0]), snr_preambles)
+plt.plot(range(captured_preambles.shape[0]), np.repeat(3,captured_preambles.shape[0]), '--', label= "SNR threshold = 3")
 plt.xlabel("samples")
-plt.ylabel("SNR")
+plt.ylabel("SNR(dB)")
+plt.legend()
 plt.show()
